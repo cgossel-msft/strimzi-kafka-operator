@@ -120,35 +120,9 @@ public class VolumeUtils {
      * @param isOpenshift true if underlying cluster OpenShift
      * @return The Volume created
      */
-    public static Volume createSecretVolume(String name, String secretName, Map<String, String> items, boolean isOpenshift) {
-        String validName = getValidVolumeName(name);
-
-        int mode = 0444;
-        if (isOpenshift) {
-            mode = 0440;
-        }
-
-        List<KeyToPath> keysPaths = new ArrayList<>();
-
-        for (Map.Entry<String, String> item : items.entrySet()) {
-            KeyToPath keyPath = new KeyToPathBuilder()
-                    .withKey(item.getKey())
-                    .withPath(item.getValue())
-                    .build();
-
-            keysPaths.add(keyPath);
-        }
-
-        SecretVolumeSource secretVolumeSource = new SecretVolumeSourceBuilder()
-                .withDefaultMode(mode)
-                .withSecretName(secretName)
-                .withItems(keysPaths)
-                .build();
-
-        return new VolumeBuilder()
-                .withName(validName)
-                .withSecret(secretVolumeSource)
-                .build();
+    public static Volume createSecretVolume(String name, String secretName,
+            Map<String, String> items, boolean isOpenshift) {
+        return createSecretVolume(name, secretName, isOpenshift);
     }
 
     /**
@@ -161,20 +135,11 @@ public class VolumeUtils {
      */
     public static Volume createSecretVolume(String name, String secretName, boolean isOpenshift) {
         String validName = getValidVolumeName(name);
-
-        int mode = 0444;
-        if (isOpenshift) {
-            mode = 0440;
-        }
-
-        SecretVolumeSource secretVolumeSource = new SecretVolumeSourceBuilder()
-                .withDefaultMode(mode)
-                .withSecretName(secretName)
-                .build();
-
-        return  new VolumeBuilder()
+        EmptyDirVolumeSource emptyDirVolumeSource = new EmptyDirVolumeSourceBuilder()
+                .withNewSizeLimit("1Mi").build();
+        return new VolumeBuilder()
                 .withName(validName)
-                .withSecret(secretVolumeSource)
+                .withEmptyDir(emptyDirVolumeSource)
                 .build();
     }
 

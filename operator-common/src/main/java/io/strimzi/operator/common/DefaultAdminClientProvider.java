@@ -6,6 +6,8 @@ package io.strimzi.operator.common;
 
 import io.strimzi.operator.common.auth.PemAuthIdentity;
 import io.strimzi.operator.common.auth.PemTrustSet;
+import io.strimzi.operator.common.cosmic.CosmicHostName;
+
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -16,9 +18,14 @@ import java.util.Properties;
  * Provides the default Kafka Admin client
  */
 public class DefaultAdminClientProvider implements AdminClientProvider {
+    private static final ReconciliationLogger LOGGER = ReconciliationLogger
+            .create(DefaultAdminClientProvider.class);
+
     @Override
-    public Admin createAdminClient(String bootstrapHostnames, PemTrustSet kafkaCaTrustSet, PemAuthIdentity authIdentity) {
-        return createAdminClient(bootstrapHostnames, kafkaCaTrustSet, authIdentity, new Properties());
+    public Admin createAdminClient(String bootstrapHostnames, PemTrustSet kafkaCaTrustSet,
+            PemAuthIdentity authIdentity) {
+        return createAdminClient(bootstrapHostnames, kafkaCaTrustSet, authIdentity,
+                new Properties());
     }
 
     /**
@@ -61,6 +68,15 @@ public class DefaultAdminClientProvider implements AdminClientProvider {
         if (config == null) {
             throw new InvalidConfigurationException("The config parameter should not be null");
         }
+
+        var hosts = bootstrapHostnames.split(",");
+        for (int i = 0; i < hosts.length; i++) {
+            hosts[i] = CosmicHostName.substitute(hosts[i]);
+        }
+
+        bootstrapHostnames = String.join(",", hosts);
+
+        LOGGER.infoOp("creating cosmic admin client: bootstrap=" + bootstrapHostnames);
 
         config.setProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapHostnames);
 

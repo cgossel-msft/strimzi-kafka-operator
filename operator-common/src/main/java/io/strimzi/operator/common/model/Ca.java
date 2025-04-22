@@ -16,6 +16,7 @@ import io.strimzi.operator.common.Annotations;
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.Util;
+import io.strimzi.operator.common.auth.PemAuthIdentity;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -301,6 +302,7 @@ public abstract class Ca {
     protected RenewalType renewalType;
     protected boolean caCertsRemoved;
     protected final CertificateExpirationPolicy policy;
+    private final PemAuthIdentity caPem;
 
     /**
      * Constructs the CA object
@@ -340,6 +342,7 @@ public abstract class Ca {
         this.policy = policy == null ? CertificateExpirationPolicy.RENEW_CERTIFICATE : policy;
         this.renewalType = RenewalType.NOOP;
         this.clock = Clock.systemUTC();
+        this.caPem = PemAuthIdentity.clusterOperator(caKeySecret);
     }
 
     protected abstract String caName();
@@ -713,21 +716,21 @@ public abstract class Ca {
      * @return The current CA certificate as bytes.
      */
     public byte[] currentCaCertBytes() {
-        return Util.decodeBytesFromBase64(caCertSecret().getData().get(CA_CRT));
+        return this.caPem.certificateChainAsPemBytes();
     }
 
     /**
      * @return The base64 encoded bytes of the current CA certificate.
      */
     public String currentCaCertBase64() {
-        return caCertSecret().getData().get(CA_CRT);
+        return Base64.getEncoder().encodeToString(this.currentCaCertBytes());
     }
 
     /**
      * @return The current CA key as bytes.
      */
     public byte[] currentCaKey() {
-        return Util.decodeBytesFromBase64(caKeySecret().getData().get(CA_KEY));
+        return this.caPem.privateKeyAsPemBytes();
     }
 
     /**
@@ -886,15 +889,7 @@ public abstract class Ca {
      * @return  An X509Certificate instance with the certificate
      */
     public static X509Certificate cert(Secret secret, String key)  {
-        if (secret == null || secret.getData() == null || secret.getData().get(key) == null) {
-            return null;
-        }
-        byte[] bytes = Util.decodeBytesFromBase64(secret.getData().get(key));
-        try {
-            return x509Certificate(bytes);
-        } catch (CertificateException e) {
-            throw new RuntimeException("Failed to decode certificate in data." + key.replace(".", "\\.") + " of Secret " + secret.getMetadata().getName(), e);
-        }
+        return PemAuthIdentity.clusterOperator(secret).certificateChain();
     }
 
     /**
@@ -905,24 +900,7 @@ public abstract class Ca {
      * @return          Set with X509Certificate instances
      */
     public static Set<X509Certificate> certs(Secret secret)  {
-        if (secret == null || secret.getData() == null) {
-            return Set.of();
-        } else {
-            return secret
-                    .getData()
-                    .entrySet()
-                    .stream()
-                    .filter(record -> SecretEntry.CRT.matchesType(record.getKey()))
-                    .map(record -> {
-                        byte[] bytes = Util.decodeBytesFromBase64(record.getValue());
-                        try {
-                            return x509Certificate(bytes);
-                        } catch (CertificateException e) {
-                            throw new RuntimeException("Failed to decode certificate in data." + record.getKey().replace(".", "\\.") + " of Secret " + secret.getMetadata().getName(), e);
-                        }
-                    })
-                    .collect(Collectors.toSet());
-        }
+        return Set.of(PemAuthIdentity.clusterOperator(secret).certificateChain());
     }
 
     /**
@@ -1118,10 +1096,6 @@ public abstract class Ca {
      * @throws  RuntimeException if the certificate cannot be decoded or the cert does not exist
      */
     public long getCertificateExpirationDateEpoch() {
-        var cert = cert(caCertSecret, CA_CRT);
-        if (cert == null) {
-            throw new RuntimeException(CA_CRT + " does not exist in the secret " + caCertSecret);
-        }
-        return cert.getNotAfter().getTime();
+        return this.caPem.certificateChain().getNotAfter().getTime();
     }
 }
