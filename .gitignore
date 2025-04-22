@@ -1,3 +1,5 @@
+bin/
+
 # Maven build targets
 target/
 
