@@ -40,12 +40,12 @@ public class CosmicHostName {
             }
 
             LOGGER.infoOp(String.format(
-                    "waimea host substitution: in=%s, out=%s",
+                    "cosmic host substitution: in=%s, out=%s",
                     strimziAddress,
                     substitution));
             return substitution;
         } catch (Exception e) {
-            LOGGER.errorOp("waimea host substitution failed: in=" + strimziAddress, e);
+            LOGGER.errorOp("cosmic host substitution failed: in=" + strimziAddress, e);
             throw new RuntimeException(e);
         }
     }
