@@ -23,6 +23,7 @@ import io.strimzi.operator.common.model.cruisecontrol.CruiseControlHeaders;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlParameters;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlRebalanceKeys;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlUserTaskStatus;
+import io.strimzi.operator.cosmic.CosmicHostName;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -75,6 +76,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlResponse> getCruiseControlState(Reconciliation reconciliation, String host, int port, boolean verbose) {
+        host = CosmicHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STATE)
                 .withParameter(CruiseControlParameters.VERBOSE, String.valueOf(verbose))
                 .withParameter(CruiseControlParameters.JSON, "true")
@@ -170,6 +172,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     }
 
     private CompletableFuture<CruiseControlRebalanceResponse> internalRebalance(Reconciliation reconciliation, String host, int port, String path, String userTaskId) {
+        host = CosmicHostName.substitute(host);
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", host, port, path)))
                 .POST(HttpRequest.BodyPublishers.noBody());
@@ -318,6 +321,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlUserTasksResponse> getUserTaskStatus(Reconciliation reconciliation, String host, int port, String userTaskId) {
+        host = CosmicHostName.substitute(host);
         PathBuilder pathBuilder = new PathBuilder(CruiseControlEndpoints.USER_TASKS)
                         .withParameter(CruiseControlParameters.JSON, "true")
                         .withParameter(CruiseControlParameters.FETCH_COMPLETE, "true");
@@ -439,6 +443,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     @Override
     @SuppressWarnings("deprecation")
     public CompletableFuture<CruiseControlResponse> stopExecution(Reconciliation reconciliation, String host, int port) {
+        host = CosmicHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STOP)
                         .withParameter(CruiseControlParameters.JSON, "true").build();
 

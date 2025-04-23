@@ -14,6 +14,7 @@ import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.Util;
 import io.strimzi.operator.common.model.OrderedProperties;
+import io.strimzi.operator.cosmic.CosmicHostName;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -61,6 +62,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
             Reconciliation reconciliation,
             String host, int port,
             String connectorName, JsonObject configJson) {
+        host = CosmicHostName.substitute(host);
         Buffer data = configJson.toBuffer();
         String path = "/connectors/" + connectorName + "/config";
         LOGGER.debugCr(reconciliation, "Making PUT request to {} with body {}", path, configJson);
@@ -113,6 +115,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private <T> Future<T> doGet(Reconciliation reconciliation, String host, int port, String path, Set<Integer> okStatusCodes, TypeReference<T> type) {
+        host = CosmicHostName.substitute(host);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
             httpClient.request(HttpMethod.GET, port, host, path, request -> {
@@ -166,6 +169,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> delete(Reconciliation reconciliation, String host, int port, String connectorName) {
+        host = CosmicHostName.substitute(host);
         String path = "/connectors/" + connectorName;
         LOGGER.debugCr(reconciliation, "Making DELETE request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -291,6 +295,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Void> updateState(Reconciliation reconciliation, String host, int port, String path, int expectedStatusCode) {
+        host = CosmicHostName.substitute(host);
         LOGGER.debugCr(reconciliation, "Making PUT request to {} ", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
                 httpClient.request(HttpMethod.PUT, port, host, path, request -> {
@@ -319,6 +324,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<String>> list(Reconciliation reconciliation, String host, int port) {
+        host = CosmicHostName.substitute(host);
         String path = "/connectors";
         LOGGER.debugCr(reconciliation, "Making GET request to {} ", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -357,6 +363,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<ConnectorPlugin>> listConnectorPlugins(Reconciliation reconciliation, String host, int port) {
+        host = CosmicHostName.substitute(host);
         String path = "/connector-plugins";
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -390,6 +397,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Void> updateConnectorLogger(Reconciliation reconciliation, String host, int port, String logger, String level) {
+        host = CosmicHostName.substitute(host);
         String path = "/admin/loggers/" + logger + "?scope=cluster";
         JsonObject levelJO = new JsonObject();
         levelJO.put("level", level);
@@ -427,6 +435,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Map<String, String>> listConnectLoggers(Reconciliation reconciliation, String host, int port) {
+        host = CosmicHostName.substitute(host);
         String path = "/admin/loggers/";
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -570,6 +579,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Map<String, Object>> restartConnectorOrTask(String host, int port, String path) {
+        host = CosmicHostName.substitute(host);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
             httpClient.request(HttpMethod.POST, port, host, path, request -> {
                 if (request.succeeded()) {
@@ -606,6 +616,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<String>> getConnectorTopics(Reconciliation reconciliation, String host, int port, String connectorName) {
+        host = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/topics", connectorName);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -645,6 +656,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<String> getConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName) {
+        host = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -686,6 +698,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> alterConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName, String newOffsets) {
+        host = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making PATCH request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
@@ -729,6 +742,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> resetConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName) {
+        host = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making DELETE request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
