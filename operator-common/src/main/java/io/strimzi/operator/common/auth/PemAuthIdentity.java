@@ -26,9 +26,7 @@ import java.util.Objects;
 
 /**
  * Represents the identity used during TLS client authentication.
- * This consists of an X509 end-entity certificate, corresponding private key,
- * and a (possibly empty) chain of X509 intermediate CA certificates, all in PEM
- * format.
+ * This consists of an X509 end-entity certificate, corresponding private key, and a (possibly empty) chain of X509 intermediate CA certificates, all in PEM format.
  */
 public class PemAuthIdentity {
     /**
@@ -45,11 +43,8 @@ public class PemAuthIdentity {
 
     /**
      * Constructs the PemAuthIdentity.
-     * 
-     * @param secret         Kubernetes Secret containing the Cluster Operator
-     *                       public and private key
-     * @param secretCertName Key in the Kubernetes Secret that is associated with
-     *                       the requested identity
+     * @param secret Kubernetes Secret containing the Cluster Operator public and private key
+     * @param secretCertName Key in the Kubernetes Secret that is associated with the requested identity
      */
     private PemAuthIdentity(Secret secret, String secretCertName) {
         Objects.requireNonNull(secret, "Cannot extract auth identity from null secret.");
@@ -66,8 +61,7 @@ public class PemAuthIdentity {
      *
      * @param secret Kubernetes Secret containing the client authentication identity
      *
-     * @return PemAuthIdentity to use as the client authentication identity during
-     *         TLS authentication
+     * @return PemAuthIdentity to use as the client authentication identity during TLS authentication
      */
     public static PemAuthIdentity clusterOperator(Secret secret) {
         return new PemAuthIdentity(secret, "cluster-operator");
@@ -79,27 +73,23 @@ public class PemAuthIdentity {
      *
      * @param secret Kubernetes Secret containing the client authentication identity
      *
-     * @return PemAuthIdentity to use as the client authentication identity during
-     *         TLS authentication
+     * @return PemAuthIdentity to use as the client authentication identity during TLS authentication
      */
     public static PemAuthIdentity entityOperator(Secret secret) {
         return new PemAuthIdentity(secret, "entity-operator");
     }
 
     /**
-     * End-entity certificate and (possibly empty) chain of intermediate CA
-     * certificates for this authentication identity.
+     * End-entity certificate and (possibly empty) chain of intermediate CA certificates for this authentication identity.
      *
-     * @return The certificate chain for this authentication identity as a byte
-     *         array
+     * @return The certificate chain for this authentication identity as a byte array
      */
     public byte[] certificateChainAsPemBytes() {
         return certificateChainAsPemBytes;
     }
 
     /**
-     * End-entity certificate and (possibly empty) chain of intermediate CA
-     * certificates for this authentication identity.
+     * End-entity certificate and (possibly empty) chain of intermediate CA certificates for this authentication identity.
      *
      * @return The certificate chain for this authentication identity as a String
      */
@@ -108,8 +98,7 @@ public class PemAuthIdentity {
     }
 
     /**
-     * Private key corresponding to the end-entity certificate for this
-     * authentication identity.
+     * Private key corresponding to the end-entity certificate for this authentication identity.
      *
      * @return The private key for this authentication identity as a byte array
      */
@@ -118,8 +107,7 @@ public class PemAuthIdentity {
     }
 
     /**
-     * Private key corresponding to the end-entity certificate for this
-     * authentication identity.
+     * Private key corresponding to the end-entity certificate for this authentication identity.
      *
      * @return The private key for this authentication identity as a String
      */
@@ -129,7 +117,6 @@ public class PemAuthIdentity {
 
     /**
      * KeyStore to use for TLS connections.
-     * 
      * @return KeyStore file in PEM format
      */
     public byte[] pemKeyStore() {
@@ -142,10 +129,8 @@ public class PemAuthIdentity {
      * @param password to use to secure the KeyStore
      *
      * @return KeyStore file in JKS format
-     * @throws GeneralSecurityException if something goes wrong when creating the
-     *                                  truststore
-     * @throws IOException              if there is an I/O or format problem with
-     *                                  the data used to load the truststore.
+     * @throws GeneralSecurityException if something goes wrong when creating the truststore
+     * @throws IOException if there is an I/O or format problem with the data used to load the truststore.
      */
     public KeyStore jksKeyStore(char[] password) throws GeneralSecurityException, IOException {
         String strippedPrivateKey = privateKeyAsPem()
@@ -165,12 +150,10 @@ public class PemAuthIdentity {
     }
 
     /**
-     * End-entity certificate and (possibly empty) chain of intermediate CA
-     * certificates for this authentication identity.
+     * End-entity certificate and (possibly empty) chain of intermediate CA certificates for this authentication identity.
      * This also validates that the certificate chain is a valid X509 certificate.
      *
-     * @return The certificate chain for this authentication identity as a
-     *         X509Certificate
+     * @return The certificate chain for this authentication identity as a X509Certificate
      */
     public X509Certificate certificateChain() {
         try {

@@ -35,7 +35,6 @@ public class PemTrustSet {
 
     /**
      * Constructs the PemTrustSet
-     * 
      * @param secret Kubernetes Secret containing the trusted certificates
      */
     public PemTrustSet(Secret secret) {
@@ -65,7 +64,6 @@ public class PemTrustSet {
 
     /**
      * Certificates to use in a TrustStore for TLS connections.
-     * 
      * @return The set of trusted certificates as byte arrays
      */
     public Set<byte[]> trustedCertificatesBytes() {
@@ -73,9 +71,7 @@ public class PemTrustSet {
     }
 
     /**
-     * Certificates to use in a TrustStore for TLS connections, with each
-     * certificate on a separate line.
-     * 
+     * Certificates to use in a TrustStore for TLS connections, with each certificate on a separate line.
      * @return The set of trusted certificates as a byte array
      */
     public byte[] trustedCertificatesPemBytes() {
@@ -83,35 +79,19 @@ public class PemTrustSet {
     }
 
     /**
-     * Certificates to use in a TrustStore for TLS connections, with each
-     * certificate on a separate line.
-     * 
-     * @return The set of trusted certificates as a concatenated String
-     */
-    public String trustedCertificatesString() {
-        return this.pemSingleString;
-    }
-
-    /**
-     * TrustStore to use for TLS connections. This also validates each one is a
-     * valid certificate and
+     * TrustStore to use for TLS connections. This also validates each one is a valid certificate and
      * throws an exception if it is not.
-     * 
      * @return TrustStore file in JKS format
-     * @throws GeneralSecurityException if something goes wrong when creating the
-     *                                  truststore
-     * @throws IOException              if there is an I/O or format problem with
-     *                                  the data used to load the truststore.
-     *                                  This is not expected as the truststore is
-     *                                  loaded with null parameter.
+     * @throws GeneralSecurityException if something goes wrong when creating the truststore
+     * @throws IOException if there is an I/O or format problem with the data used to load the truststore.
+     * This is not expected as the truststore is loaded with null parameter.
      */
     public KeyStore jksTrustStore() throws GeneralSecurityException, IOException {
         KeyStore trustStore = KeyStore.getInstance("JKS");
         trustStore.load(null);
         int aliasIndex = 0;
         for (X509Certificate certificate : this.certSet) {
-            trustStore.setEntry(certificate.getSubjectX500Principal().getName() + "-" + aliasIndex,
-                    new KeyStore.TrustedCertificateEntry(certificate), null);
+            trustStore.setEntry(certificate.getSubjectX500Principal().getName() + "-" + aliasIndex, new KeyStore.TrustedCertificateEntry(certificate), null);
             aliasIndex++;
         }
         return trustStore;
