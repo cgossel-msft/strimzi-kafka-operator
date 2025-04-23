@@ -1,9 +1,17 @@
+/*
+ * Copyright Microsoft.
+ * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+ */
 package io.strimzi.operator.common.cosmic;
-
-import java.util.Arrays;
 
 import io.strimzi.operator.common.ReconciliationLogger;
 
+import java.util.Arrays;
+import java.util.Locale;
+
+/**
+ * Defines what kafka related host names look like in cosmic.
+ */
 public class CosmicHostName {
     private static final ReconciliationLogger LOGGER = ReconciliationLogger
             .create(CosmicHostName.class);
@@ -12,11 +20,16 @@ public class CosmicHostName {
     private static final String INTERNAL_DOMAIN_FORMAT_ENV = "COSMIC_KAFKA_DOMAIN_FORMAT";
     private static final String INTERNAL_DOMAIN_FORMAT = getInternalDomainFormat();
 
+    /**
+     * Substitute the host in the given address for the appropriate cosmic kafka host.
+     * @param strimziAddress the host to be substituted
+     * @return the address with the subsitution
+     */
     public static String substitute(String strimziAddress) {
         try {
             // given {<prefix>.}*<service>.<namespace>.svc{.cluster.local}{:<port>}
             // split everything before ".svc" by periods
-            var index = strimziAddress.toLowerCase().indexOf(".svc");
+            var index = strimziAddress.toLowerCase(Locale.US).indexOf(".svc");
             var parts = strimziAddress.substring(0, index).split("\\.");
 
             // namespace is the last part, service the previous

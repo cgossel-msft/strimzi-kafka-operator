@@ -79,6 +79,14 @@ public class PemTrustSet {
     }
 
     /**
+     * Certificates to use in a TrustStore for TLS connections, with each certificate on a separate line.
+     * @return The set of trusted certificates as a concatenated String
+     */
+    public String trustedCertificatesString() {
+        return this.pemSingleString;
+    }
+
+    /**
      * TrustStore to use for TLS connections. This also validates each one is a valid certificate and
      * throws an exception if it is not.
      * @return TrustStore file in JKS format

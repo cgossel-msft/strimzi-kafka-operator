@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoField.DAY_OF_MONTH;
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
@@ -1052,23 +1051,23 @@ public abstract class Ca {
      */
     protected abstract String caCertGenerationAnnotation();
 
-    /**
-     * Checks if the CA generation on any of the existing Secrets with server certificates signed by this CA changed or
-     * not.
-     *
-     * @param existingServerSecrets     List of existing Secrets with server certificates
-     *
-     * @return  True if any Secret has different CA generation. False otherwise.
-     */
-    private boolean hasCaCertGenerationChanged(List<HasMetadata> existingServerSecrets) {
-        boolean hasChanged = false;
+    // /**
+    //  * Checks if the CA generation on any of the existing Secrets with server certificates signed by this CA changed or
+    //  * not.
+    //  *
+    //  * @param existingServerSecrets     List of existing Secrets with server certificates
+    //  *
+    //  * @return  True if any Secret has different CA generation. False otherwise.
+    //  */
+    // private boolean hasCaCertGenerationChanged(List<HasMetadata> existingServerSecrets) {
+    //     boolean hasChanged = false;
 
-        for (HasMetadata secret : existingServerSecrets)    {
-            hasChanged |= hasCaCertGenerationChanged(secret);
-        }
+    //     for (HasMetadata secret : existingServerSecrets)    {
+    //         hasChanged |= hasCaCertGenerationChanged(secret);
+    //     }
 
-        return hasChanged;
-    }
+    //     return hasChanged;
+    // }
 
     /**
      * It checks if the current (cluster or clients) CA certificate generation is changed compared to the one
