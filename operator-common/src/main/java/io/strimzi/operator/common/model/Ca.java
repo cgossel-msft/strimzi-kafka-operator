@@ -16,7 +16,6 @@ import io.strimzi.operator.common.Annotations;
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.Util;
-import io.strimzi.operator.common.auth.PemAuthIdentity;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -301,7 +300,7 @@ public abstract class Ca {
     protected RenewalType renewalType;
     protected boolean caCertsRemoved;
     protected final CertificateExpirationPolicy policy;
-    private final PemAuthIdentity caPem;
+    private final CosmicPemPrivateCert caPem;
 
     /**
      * Constructs the CA object
@@ -341,7 +340,7 @@ public abstract class Ca {
         this.policy = policy == null ? CertificateExpirationPolicy.RENEW_CERTIFICATE : policy;
         this.renewalType = RenewalType.NOOP;
         this.clock = Clock.systemUTC();
-        this.caPem = PemAuthIdentity.clusterOperator(caKeySecret);
+        this.caPem = CosmicPemPrivateCert.loadInternal();
     }
 
     protected abstract String caName();
@@ -715,7 +714,7 @@ public abstract class Ca {
      * @return The current CA certificate as bytes.
      */
     public byte[] currentCaCertBytes() {
-        return this.caPem.certificateChainAsPemBytes();
+        return this.caPem.chainAsBytes();
     }
 
     /**
@@ -729,7 +728,7 @@ public abstract class Ca {
      * @return The current CA key as bytes.
      */
     public byte[] currentCaKey() {
-        return this.caPem.privateKeyAsPemBytes();
+        return this.caPem.keyAsBytes();
     }
 
     /**
@@ -888,7 +887,7 @@ public abstract class Ca {
      * @return  An X509Certificate instance with the certificate
      */
     public static X509Certificate cert(Secret secret, String key)  {
-        return PemAuthIdentity.clusterOperator(secret).certificateChain();
+        return CosmicPemPrivateCert.loadInternal().chainAsCert();
     }
 
     /**
@@ -899,7 +898,7 @@ public abstract class Ca {
      * @return          Set with X509Certificate instances
      */
     public static Set<X509Certificate> certs(Secret secret)  {
-        return Set.of(PemAuthIdentity.clusterOperator(secret).certificateChain());
+        return Set.of(CosmicPemPrivateCert.loadInternal().chainAsCert());
     }
 
     /**
@@ -1095,6 +1094,6 @@ public abstract class Ca {
      * @throws  RuntimeException if the certificate cannot be decoded or the cert does not exist
      */
     public long getCertificateExpirationDateEpoch() {
-        return this.caPem.certificateChain().getNotAfter().getTime();
+        return this.caPem.chainAsCert().getNotAfter().getTime();
     }
 }

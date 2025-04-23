@@ -5,20 +5,15 @@
 package io.strimzi.operator.common.auth;
 
 import io.fabric8.kubernetes.api.model.Secret;
-import io.strimzi.operator.common.Util;
+import io.strimzi.operator.common.model.CosmicPemPrivateCert;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
@@ -35,13 +30,7 @@ public class PemAuthIdentity {
      * Filename suffix for certificate chain as PEM
      */
     public static final String PEM_SUFFIX = "pem";
-    private static final String COSMIC_CERT_ENV = "COSMIC_KAFKA_INTERNAL_CERT";
-    private static final String PEM_PRIVATE_KEY_BEGIN = "-----BEGIN PRIVATE KEY-----";
-    private static final String PEM_PRIVATE_KEY_END = "-----END PRIVATE KEY-----";
-    private final byte[] privateKeyAsPemBytes;
-    private final byte[] certificateChainAsPemBytes;
-    private final String secretCertName;
-    private final String secretName;
+    private final CosmicPemPrivateCert cert;
 
     /**
      * Constructs the PemAuthIdentity.
@@ -53,11 +42,7 @@ public class PemAuthIdentity {
      */
     private PemAuthIdentity(Secret secret, String secretCertName) {
         Objects.requireNonNull(secret, "Cannot extract auth identity from null secret.");
-        this.secretCertName = secretCertName;
-        this.secretName = secret.getMetadata().getName();
-        var privateCert = getCosmicKafkaCert();
-        this.privateKeyAsPemBytes = privateCert.key.getBytes(StandardCharsets.US_ASCII);
-        this.certificateChainAsPemBytes = privateCert.chain.getBytes(StandardCharsets.US_ASCII);
+        this.cert = CosmicPemPrivateCert.loadInternal();
     }
 
     /**
@@ -94,7 +79,7 @@ public class PemAuthIdentity {
      *         array
      */
     public byte[] certificateChainAsPemBytes() {
-        return certificateChainAsPemBytes;
+        return this.cert.chainAsBytes();
     }
 
     /**
@@ -104,7 +89,7 @@ public class PemAuthIdentity {
      * @return The certificate chain for this authentication identity as a String
      */
     public String certificateChainAsPem() {
-        return Util.fromAsciiBytes(certificateChainAsPemBytes);
+        return this.cert.chain();
     }
 
     /**
@@ -114,7 +99,7 @@ public class PemAuthIdentity {
      * @return The private key for this authentication identity as a byte array
      */
     public byte[] privateKeyAsPemBytes() {
-        return privateKeyAsPemBytes;
+        return this.cert.keyAsBytes();
     }
 
     /**
@@ -124,7 +109,7 @@ public class PemAuthIdentity {
      * @return The private key for this authentication identity as a String
      */
     public String privateKeyAsPem() {
-        return Util.fromAsciiBytes(privateKeyAsPemBytes);
+        return this.cert.key();
     }
 
     /**
@@ -148,10 +133,7 @@ public class PemAuthIdentity {
      *                                  the data used to load the truststore.
      */
     public KeyStore jksKeyStore(char[] password) throws GeneralSecurityException, IOException {
-        String strippedPrivateKey = privateKeyAsPem()
-                .replace(PEM_PRIVATE_KEY_BEGIN, "")
-                .replaceAll(System.lineSeparator(), "")
-                .replace(PEM_PRIVATE_KEY_END, "");
+        String strippedPrivateKey = this.cert.strippedKey();
         byte[] decodedKey = Base64.getDecoder().decode(strippedPrivateKey);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedKey);
         final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -159,7 +141,7 @@ public class PemAuthIdentity {
 
         KeyStore coKeyStore = KeyStore.getInstance("JKS");
         coKeyStore.load(null);
-        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[]{certificateChain()});
+        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[] { certificateChain() });
         return coKeyStore;
     }
 
@@ -172,32 +154,6 @@ public class PemAuthIdentity {
      *         X509Certificate
      */
     public X509Certificate certificateChain() {
-        try {
-            final CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            return (X509Certificate) certificateFactory
-                    .generateCertificate(new ByteArrayInputStream(certificateChainAsPemBytes));
-        } catch (CertificateException e) {
-            throw new RuntimeException(
-                    "Bad/corrupt certificate found in data." + secretCertName + ".crt of Secret "
-                            + secretName);
-        }
+        return this.cert.chainAsCert();
     }
-
-    protected static PemPrivateCert getCosmicKafkaCert() {
-        try {
-            String certPath = System.getenv(COSMIC_CERT_ENV);
-            String certString = Files.readString(Path.of(certPath));
-            int privateStart = certString.indexOf(PEM_PRIVATE_KEY_BEGIN);
-            int privateEnd = certString.indexOf(PEM_PRIVATE_KEY_END) + PEM_PRIVATE_KEY_END.length();
-            String privateKeyString = certString.substring(privateStart, privateEnd);
-            String certChainString = certString.substring(0, privateStart)
-                    + certString.substring(privateEnd);
-            return new PemPrivateCert(privateKeyString, certChainString);
-        } catch (Throwable e) {
-            throw new RuntimeException("Could not read cosmic internal cert", e);
-        }
-    }
-
-    protected static record PemPrivateCert(String key, String chain) {
-    };
 }
