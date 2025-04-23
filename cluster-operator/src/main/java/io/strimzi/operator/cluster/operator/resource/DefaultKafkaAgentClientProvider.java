@@ -12,14 +12,12 @@ import io.strimzi.operator.common.auth.TlsPemIdentity;
 import io.strimzi.operator.cosmic.CosmicHostName;
 
 /**
- * Class to provide the real KafkaAgentClient which connects to actual Kafka
- * Agent
+ * Class to provide the real KafkaAgentClient which connects to actual Kafka Agent
  */
 public class DefaultKafkaAgentClientProvider implements KafkaAgentClientProvider {
 
     @Override
-    public KafkaAgentClient createKafkaAgentClient(Reconciliation reconciliation,
-            TlsPemIdentity tlsPemIdentity) {
+    public KafkaAgentClient createKafkaAgentClient(Reconciliation reconciliation, TlsPemIdentity tlsPemIdentity) {
         return new RedirectedKafkaAgentClient(reconciliation, reconciliation.name(),
                 reconciliation.namespace(), tlsPemIdentity);
     }

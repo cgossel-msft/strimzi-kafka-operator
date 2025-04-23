@@ -76,11 +76,25 @@ public class ClusterCa extends Ca {
         return "Cluster CA";
     }
 
+    /**
+     * Prepares the Cruise Control certificate. It either reuses the existing certificate, renews it or generates new
+     * certificate if needed.
+     *
+     * @param namespace                             Namespace of the Kafka cluster
+     * @param clusterName                           Name of the Kafka cluster
+     * @param existingSecret                        Existing Secret with the existing certificates (or null if it does not exist yet)
+     * @param isMaintenanceTimeWindowsSatisfied     Flag indicating whether we can do maintenance tasks or not
+     *
+     * @return  Map with CertAndKey object containing the public and private key
+     *
+     * @throws IOException  IOException is thrown when it is raised while working with the certificates
+     */
     protected Map<String, CertAndKey> generateCcCerts(
-        String namespace,
-        String clusterName,
-        Secret existingSecret,
-        boolean isMaintenanceTimeWindowsSatisfied) throws IOException {
+            String namespace,
+            String clusterName,
+            Secret existingSecret,
+            boolean isMaintenanceTimeWindowsSatisfied
+    ) throws IOException {
         return generateCerts(Set.of(new NodeRef(CruiseControl.COMPONENT_TYPE, 0, null, false, false)));
     }
 
@@ -108,6 +122,23 @@ public class ClusterCa extends Ca {
         return generateCerts(nodes);
     }
 
+
+    /**
+     * Prepares the Kafka broker certificates. It either reuses the existing certificates, renews them or generates new
+     * certificates if needed.
+     *
+     * @param namespace                             Namespace of the Kafka cluster
+     * @param clusterName                           Name of the Kafka cluster
+     * @param existingSecret                        Existing Secret with the existing certificates (or null if it does not exist yet)
+     * @param nodes                                 Nodes that are part of the Kafka cluster
+     * @param externalBootstrapAddresses            List of external bootstrap addresses (used for certificate SANs)
+     * @param externalAddresses                     Map with external listener addresses for the different nodes (used for certificate SANs)
+     * @param isMaintenanceTimeWindowsSatisfied     Flag indicating whether we can do maintenance tasks or not
+     *
+     * @return  Map with CertAndKey objects containing the public and private keys for the different brokers
+     *
+     * @throws IOException  IOException is thrown when it is raised while working with the certificates
+     */
     protected Map<String, CertAndKey> generateBrokerCerts(
             String namespace,
             String clusterName,
@@ -115,7 +146,8 @@ public class ClusterCa extends Ca {
             Set<NodeRef> nodes,
             Set<String> externalBootstrapAddresses,
             Map<Integer, Set<String>> externalAddresses,
-            boolean isMaintenanceTimeWindowsSatisfied) throws IOException {
+            boolean isMaintenanceTimeWindowsSatisfied
+    ) throws IOException {
         return generateCerts(nodes);
     }
 
@@ -134,6 +166,10 @@ public class ClusterCa extends Ca {
         return certs;
     }
 
+    /**
+     * Remove old certificates that are stored in the CA Secret matching the "ca-YYYY-MM-DDTHH-MM-SSZ.crt" naming pattern.
+     * NOTE: mostly used when a CA certificate is renewed by replacing the key
+     */
     public void maybeDeleteOldCerts() {
     }
 }
