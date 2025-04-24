@@ -90,9 +90,9 @@ public class CosmicPemPrivateCert {
      */
     public String strippedKey() {
         return this.key
-                    .replace(PEM_PRIVATE_KEY_BEGIN, "")
-                    .replaceAll(System.lineSeparator(), "")
-                    .replace(PEM_PRIVATE_KEY_END, "");
+                .replace(PEM_PRIVATE_KEY_BEGIN, "")
+                .replaceAll(System.lineSeparator(), "")
+                .replace(PEM_PRIVATE_KEY_END, "");
     }
 
     /**
