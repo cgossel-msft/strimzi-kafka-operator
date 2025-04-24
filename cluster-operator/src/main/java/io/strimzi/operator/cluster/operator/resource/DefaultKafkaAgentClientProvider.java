@@ -4,12 +4,12 @@
  */
 package io.strimzi.operator.cluster.operator.resource;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.auth.TlsPemIdentity;
 import io.strimzi.operator.cosmic.CosmicHostName;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Class to provide the real KafkaAgentClient which connects to actual Kafka Agent

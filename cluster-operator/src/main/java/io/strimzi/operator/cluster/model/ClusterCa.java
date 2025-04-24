@@ -18,6 +18,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+/**
+ * Represents the Cluster CA
+ */
 public class ClusterCa extends Ca {
     private static final CertAndKey EMPTY = new CertAndKey(new byte[0], new byte[0]);
 

@@ -1,22 +1,8 @@
 /*
-* Copyright Strimzi authors.
-* License: Apache License 2.0 (see the file LICENSE or
-http://apache.org/licenses/LICENSE-2.0.html).
-*/
+ * Copyright Strimzi authors.
+ * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+ */
 package io.strimzi.operator.cluster.operator.resource.kubernetes;
-
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import io.fabric8.kubernetes.api.model.DeletionPropagation;
 import io.fabric8.kubernetes.api.model.LabelSelector;
@@ -51,6 +37,19 @@ import io.strimzi.operator.common.operator.resource.ReconcileResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
+import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 /**
  * Operations for {@code Secret}s.
  */
@@ -59,10 +58,10 @@ public class SecretOperator extends
     private static final ReconciliationLogger LOGGER = ReconciliationLogger
             .create(SecretOperator.class);
     private static final String KAFKA_CLUSTER_NAME_ENV = "COSMIC_KAFKA_CLUSTER_NAME";
-    private static final String[] CERT_SECRETS_SUFFIXES = new String[] { "clients-ca",
-            "clients-ca-cert",
-            "cluster-ca", "cluster-ca-cert", "cluster-operator-certs",
-            "entity-topic-operator-certs", "entity-user-operator-certs", "kafka-brokers" };
+    private static final String[] CERT_SECRETS_SUFFIXES = new String[] {
+        "clients-ca", "clients-ca-cert", "cluster-ca",
+        "cluster-ca-cert", "cluster-operator-certs", "entity-topic-operator-certs",
+        "entity-user-operator-certs", "kafka-brokers"};
     private static final String INIT_GENERATION = String.valueOf(Ca.INIT_GENERATION);
     private final HashMap<String, Secret> secrets;
 
