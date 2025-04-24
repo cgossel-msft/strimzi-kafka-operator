@@ -76,14 +76,14 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlResponse> getCruiseControlState(Reconciliation reconciliation, String host, int port, boolean verbose) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STATE)
                 .withParameter(CruiseControlParameters.VERBOSE, String.valueOf(verbose))
                 .withParameter(CruiseControlParameters.JSON, "true")
                 .build();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", host, port, path)))
+                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", subHost, port, path)))
                 .GET();
 
         if (authHttpHeader != null) {
@@ -110,14 +110,14 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                         LOGGER.debugCr(reconciliation, "Got {} response to GET request to {} : userTaskID = {}", response.statusCode(), path, userTaskID);
                         if (json.has(CC_REST_API_ERROR_KEY)) {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                    "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                             json.get(CC_REST_API_ERROR_KEY)));
                         } else {
                             return CompletableFuture.completedFuture(new CruiseControlResponse(userTaskID, json));
                         }
                     } else {
                         return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                "Unexpected status code " + response.statusCode() + " for request to " + host + ":" + port + path));
+                                "Unexpected status code " + response.statusCode() + " for request to " + subHost + ":" + port + path));
                     }
 
                 })
@@ -172,9 +172,9 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     }
 
     private CompletableFuture<CruiseControlRebalanceResponse> internalRebalance(Reconciliation reconciliation, String host, int port, String path, String userTaskId) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", host, port, path)))
+                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", subHost, port, path)))
                 .POST(HttpRequest.BodyPublishers.noBody());
 
         if (authHttpHeader != null) {
@@ -205,7 +205,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                         LOGGER.debugCr(reconciliation, "Got {} response to POST request to {} : userTaskID = {}", response.statusCode(), path, userTaskID);
                         if (json.has(CC_REST_API_ERROR_KEY)) {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                    "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                             json.get(CC_REST_API_ERROR_KEY).asText()));
                         } else {
                             return CompletableFuture.completedFuture(new CruiseControlRebalanceResponse(userTaskID, json));
@@ -219,7 +219,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                             ccResponse.setProposalStillCalculating(true);
                         } else {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path +
+                                    "Error for request: " + subHost + ":" + port + path +
                                             ". 202 Status code did not contain progress key. Server returned: " +
                                             ccResponse.getJson().toString()));
                         }
@@ -241,17 +241,17 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                             } else {
                                 // If there was any other kind of error propagate this to the operator
                                 return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                        "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                        "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                                 errorString));
                             }
                         } else {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                    "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                             json));
                         }
                     } else {
                         return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                "Unexpected status code " + response.statusCode() + " for request to " + host + ":" + port + path));
+                                "Unexpected status code " + response.statusCode() + " for request to " + subHost + ":" + port + path));
                     }
                 })
                 .exceptionally(ex -> {
@@ -321,7 +321,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlUserTasksResponse> getUserTaskStatus(Reconciliation reconciliation, String host, int port, String userTaskId) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         PathBuilder pathBuilder = new PathBuilder(CruiseControlEndpoints.USER_TASKS)
                         .withParameter(CruiseControlParameters.JSON, "true")
                         .withParameter(CruiseControlParameters.FETCH_COMPLETE, "true");
@@ -333,7 +333,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
         String path = pathBuilder.build();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", host, port, path)))
+                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", subHost, port, path)))
                 .GET();
 
         if (authHttpHeader != null) {
@@ -371,7 +371,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                             // This should not be an error with a 200 status but we play it safe
                             if (jsonUserTask.has(CC_REST_API_ERROR_KEY)) {
                                 return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                        "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                        "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                                 json.get(CC_REST_API_ERROR_KEY).asText()));
                             }
 
@@ -427,12 +427,12 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                             return CompletableFuture.completedFuture(ccResponse);
                         } else {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path + ". Server returned: " + errorString));
+                                    "Error for request: " + subHost + ":" + port + path + ". Server returned: " + errorString));
                         }
                     } else {
                         return CompletableFuture.failedFuture(new CruiseControlRestException(
                                 "Unexpected status code " + response.statusCode() + " for GET request to " +
-                                        host + ":" + port + path));
+                                        subHost + ":" + port + path));
                     }
                 })
                 .exceptionally(ex -> {
@@ -443,12 +443,12 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     @Override
     @SuppressWarnings("deprecation")
     public CompletableFuture<CruiseControlResponse> stopExecution(Reconciliation reconciliation, String host, int port) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STOP)
                         .withParameter(CruiseControlParameters.JSON, "true").build();
 
         HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", host, port, path)))
+                .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", subHost, port, path)))
                 .POST(HttpRequest.BodyPublishers.noBody());
 
         if (authHttpHeader != null) {
@@ -475,14 +475,14 @@ public class CruiseControlApiImpl implements CruiseControlApi {
                         LOGGER.debugCr(reconciliation, "Got {} response to POST request to {} : userTaskID = {}", response.statusCode(), path, userTaskID);
                         if (json.has(CC_REST_API_ERROR_KEY)) {
                             return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                    "Error for request: " + host + ":" + port + path + ". Server returned: " +
+                                    "Error for request: " + subHost + ":" + port + path + ". Server returned: " +
                                             json.get(CC_REST_API_ERROR_KEY)));
                         } else {
                             return CompletableFuture.completedFuture(new CruiseControlResponse(userTaskID, json));
                         }
                     } else {
                         return CompletableFuture.failedFuture(new CruiseControlRestException(
-                                "Unexpected status code " + response.statusCode() + " for request to " + host + ":" + port + path));
+                                "Unexpected status code " + response.statusCode() + " for request to " + subHost + ":" + port + path));
                     }
 
                 })
