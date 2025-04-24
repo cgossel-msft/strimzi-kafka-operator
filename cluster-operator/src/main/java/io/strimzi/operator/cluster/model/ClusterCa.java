@@ -15,7 +15,9 @@ import io.strimzi.operator.common.Util;
 import io.strimzi.operator.common.model.Ca;
 import io.strimzi.operator.common.model.PasswordGenerator;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -331,6 +333,19 @@ public class ClusterCa extends Ca {
         }
 
         return certs;
+    }
+
+    /**
+     * Checks whether a given key exists in the Secret
+     *
+     * @param secret    Kubernetes Secret containing desired entry
+     * @param podName   Name of the pod which secret entry is looked for
+     * @param entry     The SecretEntry type
+     *
+     * @return  True if the Secret contains a key based on the pod name and entry type. False otherwise.
+     */
+    private static boolean secretEntryExists(Secret secret, String podName, SecretEntry entry) {
+        return secret.getData().containsKey(entry.asKey(podName));
     }
 
     /**
