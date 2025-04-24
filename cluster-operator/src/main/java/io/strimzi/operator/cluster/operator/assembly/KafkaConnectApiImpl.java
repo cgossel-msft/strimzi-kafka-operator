@@ -62,12 +62,12 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
             Reconciliation reconciliation,
             String host, int port,
             String connectorName, JsonObject configJson) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         Buffer data = configJson.toBuffer();
         String path = "/connectors/" + connectorName + "/config";
         LOGGER.debugCr(reconciliation, "Making PUT request to {} with body {}", path, configJson);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-            httpClient.request(HttpMethod.PUT, port, host, path, request -> {
+            httpClient.request(HttpMethod.PUT, port, subHost, path, request -> {
                 if (request.succeeded()) {
                     request.result().setFollowRedirects(true)
                             .putHeader("Accept", "application/json")
@@ -115,10 +115,10 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private <T> Future<T> doGet(Reconciliation reconciliation, String host, int port, String path, Set<Integer> okStatusCodes, TypeReference<T> type) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-            httpClient.request(HttpMethod.GET, port, host, path, request -> {
+            httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
                 if (request.succeeded()) {
                     request.result().setFollowRedirects(true)
                             .putHeader("Accept", "application/json");
@@ -169,11 +169,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> delete(Reconciliation reconciliation, String host, int port, String connectorName) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = "/connectors/" + connectorName;
         LOGGER.debugCr(reconciliation, "Making DELETE request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-            httpClient.request(HttpMethod.DELETE, port, host, path, request -> {
+            httpClient.request(HttpMethod.DELETE, port, subHost, path, request -> {
                 if (request.succeeded()) {
                     request.result().setFollowRedirects(true)
                             .putHeader("Accept", "application/json")
@@ -183,7 +183,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
                             if (response.result().statusCode() == 204) {
                                 LOGGER.debugCr(reconciliation, "Connector was deleted. Waiting for status deletion!");
                                 withBackoff(reconciliation, new BackOff(200L, 2, 10), connectorName, Collections.singleton(200),
-                                    () -> status(reconciliation, host, port, connectorName, Collections.singleton(404)), "status")
+                                    () -> status(reconciliation, subHost, port, connectorName, Collections.singleton(404)), "status")
                                     .onComplete(res -> {
                                         if (res.succeeded()) {
                                             result.complete();
@@ -295,10 +295,10 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Void> updateState(Reconciliation reconciliation, String host, int port, String path, int expectedStatusCode) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         LOGGER.debugCr(reconciliation, "Making PUT request to {} ", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.PUT, port, host, path, request -> {
+                httpClient.request(HttpMethod.PUT, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json");
@@ -310,7 +310,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
                                     });
                                 } else {
                                     result.fail("Unexpected status code " + response.result().statusCode()
-                                            + " for PUT request to " + host + ":" + port + path);
+                                            + " for PUT request to " + subHost + ":" + port + path);
                                 }
                             } else {
                                 result.tryFail(response.cause());
@@ -324,11 +324,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<String>> list(Reconciliation reconciliation, String host, int port) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = "/connectors";
         LOGGER.debugCr(reconciliation, "Making GET request to {} ", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.GET, port, host, path, request -> {
+                httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
 
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
@@ -363,11 +363,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<ConnectorPlugin>> listConnectorPlugins(Reconciliation reconciliation, String host, int port) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = "/connector-plugins";
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.GET, port, host, path, request -> {
+                httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json");
@@ -397,7 +397,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Void> updateConnectorLogger(Reconciliation reconciliation, String host, int port, String logger, String level) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = "/admin/loggers/" + logger + "?scope=cluster";
         JsonObject levelJO = new JsonObject();
         levelJO.put("level", level);
@@ -405,7 +405,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) -> {
             Buffer buffer = levelJO.toBuffer();
             httpClient
-                    .request(HttpMethod.PUT, port, host, path, request -> {
+                    .request(HttpMethod.PUT, port, subHost, path, request -> {
                         if (request.succeeded()) {
                             request.result().putHeader("Content-Type", "application/json")
                                     .setFollowRedirects(true)
@@ -435,11 +435,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Map<String, String>> listConnectLoggers(Reconciliation reconciliation, String host, int port) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = "/admin/loggers/";
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.GET, port, host, path, request -> {
+                httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json");
@@ -579,9 +579,9 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
     }
 
     private Future<Map<String, Object>> restartConnectorOrTask(String host, int port, String path) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-            httpClient.request(HttpMethod.POST, port, host, path, request -> {
+            httpClient.request(HttpMethod.POST, port, subHost, path, request -> {
                 if (request.succeeded()) {
                     request.result().setFollowRedirects(true)
                             .putHeader("Accept", "application/json");
@@ -602,7 +602,7 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
                                 });
                             } else {
                                 result.fail("Unexpected status code " + response.result().statusCode()
-                                        + " for POST request to " + host + ":" + port + path);
+                                        + " for POST request to " + subHost + ":" + port + path);
                             }
                         } else {
                             result.tryFail(response.cause());
@@ -616,11 +616,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<List<String>> getConnectorTopics(Reconciliation reconciliation, String host, int port, String connectorName) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/topics", connectorName);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-            httpClient.request(HttpMethod.GET, port, host, path, request -> {
+            httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
                 if (request.succeeded()) {
                     request.result().setFollowRedirects(true)
                             .putHeader("Accept", "application/json");
@@ -656,11 +656,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<String> getConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making GET request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.GET, port, host, path, request -> {
+                httpClient.request(HttpMethod.GET, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json")
@@ -698,11 +698,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> alterConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName, String newOffsets) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making PATCH request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.PATCH, port, host, path, request -> {
+                httpClient.request(HttpMethod.PATCH, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json")
@@ -742,11 +742,11 @@ class KafkaConnectApiImpl implements KafkaConnectApi {
 
     @Override
     public Future<Void> resetConnectorOffsets(Reconciliation reconciliation, String host, int port, String connectorName) {
-        host = CosmicHostName.substitute(host);
+        var subHost = CosmicHostName.substitute(host);
         String path = String.format("/connectors/%s/offsets", connectorName);
         LOGGER.debugCr(reconciliation, "Making DELETE request to {}", path);
         return HttpClientUtils.withHttpClient(vertx, new HttpClientOptions().setLogActivity(true), (httpClient, result) ->
-                httpClient.request(HttpMethod.DELETE, port, host, path, request -> {
+                httpClient.request(HttpMethod.DELETE, port, subHost, path, request -> {
                     if (request.succeeded()) {
                         request.result().setFollowRedirects(true)
                                 .putHeader("Accept", "application/json");
