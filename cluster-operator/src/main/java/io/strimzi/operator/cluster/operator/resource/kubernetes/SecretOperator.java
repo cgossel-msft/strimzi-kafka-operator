@@ -148,7 +148,6 @@ public class SecretOperator extends
         return new RedirectOperation();
     }
 
-    // CHECKSTYLE_OFF: LineLengthCheck
     private class RedirectOperation
             implements MixedOperation<Secret, SecretList, Resource<Secret>> {
 
@@ -480,5 +479,4 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'replaceStatus'");
         }
     }
-    // CHECKSTYLE_ON: LineLengthCheck
 }
