@@ -170,18 +170,21 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'withName'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean delete(List<Secret> arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'delete'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public ItemWritableOperation<Secret> dryRun() {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'dryRun'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public ItemWritableOperation<Secret> dryRun(boolean arg0) {
             // TODO Auto-generated method stub
@@ -300,6 +303,7 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'withoutField'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public FilterWatchListDeletable<Secret, SecretList, Resource<Secret>> withoutFields(
                 Map<String, String> arg0) {
@@ -314,6 +318,7 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'withoutLabel'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public FilterWatchListDeletable<Secret, SecretList, Resource<Secret>> withoutLabels(
                 Map<String, String> arg0) {
@@ -333,6 +338,7 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'list'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public SecretList list(Integer arg0, String arg1) {
             // TODO Auto-generated method stub
@@ -357,6 +363,7 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'watch'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Watch watch(String arg0, Watcher<Secret> arg1) {
             // TODO Auto-generated method stub
@@ -425,6 +432,7 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'runnableInformer'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Informable<Secret> withIndexers(Map<String, Function<Secret, List<String>>> arg0) {
             // TODO Auto-generated method stub
@@ -437,42 +445,49 @@ public class SecretOperator extends
             throw new UnsupportedOperationException("Unimplemented method 'withLimit'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret create(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'create'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret createOrReplace(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'createOrReplace'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public List<StatusDetails> delete(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'delete'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret patchStatus(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'patchStatus'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret updateStatus(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'updateStatus'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret replace(Secret arg0) {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'replace'");
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Secret replaceStatus(Secret arg0) {
             // TODO Auto-generated method stub
