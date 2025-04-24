@@ -141,7 +141,7 @@ public class PemAuthIdentity {
 
         KeyStore coKeyStore = KeyStore.getInstance("JKS");
         coKeyStore.load(null);
-        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[] { certificateChain() });
+        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[]{certificateChain()});
         return coKeyStore;
     }
 
