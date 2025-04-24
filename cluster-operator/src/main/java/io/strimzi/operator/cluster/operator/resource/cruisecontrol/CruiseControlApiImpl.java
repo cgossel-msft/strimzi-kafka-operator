@@ -17,13 +17,13 @@ import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.TimeoutException;
 import io.strimzi.operator.common.Util;
 import io.strimzi.operator.common.auth.PemTrustSet;
+import io.strimzi.operator.common.cosmic.CosmicHostName;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlApiProperties;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlEndpoints;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlHeaders;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlParameters;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlRebalanceKeys;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlUserTaskStatus;
-import io.strimzi.operator.cosmic.CosmicHostName;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;

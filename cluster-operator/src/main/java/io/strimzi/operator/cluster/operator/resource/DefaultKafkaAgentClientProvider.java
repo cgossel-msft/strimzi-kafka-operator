@@ -6,7 +6,7 @@ package io.strimzi.operator.cluster.operator.resource;
 
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.auth.TlsPemIdentity;
-import io.strimzi.operator.cosmic.CosmicHostName;
+import io.strimzi.operator.common.cosmic.CosmicHostName;
 
 import java.net.URI;
 import java.net.URISyntaxException;
