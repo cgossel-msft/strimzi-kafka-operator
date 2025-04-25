@@ -5,7 +5,7 @@
 package io.strimzi.operator.common.auth;
 
 import io.fabric8.kubernetes.api.model.Secret;
-import io.strimzi.operator.common.model.CosmicPemPrivateCert;
+import io.strimzi.operator.common.model.MicrosoftPemPrivateCert;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -22,7 +22,7 @@ public class PemTrustSet {
      * Filename suffix for certificate files
      */
     public static final String CERT_SUFFIX = "crt";
-    private final CosmicPemPrivateCert cert;
+    private final MicrosoftPemPrivateCert cert;
 
     /**
      * Constructs the PemTrustSet
@@ -30,11 +30,12 @@ public class PemTrustSet {
      */
     public PemTrustSet(Secret secret) {
         Objects.requireNonNull(secret, "Cannot extract trust set from null secret.");
-        this.cert = CosmicPemPrivateCert.loadInternal();
+        this.cert = MicrosoftPemPrivateCert.loadInternal();
     }
 
     /**
      * Certificates to use in a TrustStore for TLS connections.
+     * 
      * @return The set of trusted certificates as byte arrays
      */
     public Set<byte[]> trustedCertificatesBytes() {
@@ -70,7 +71,8 @@ public class PemTrustSet {
         trustStore.load(null);
         int aliasIndex = 0;
         for (X509Certificate certificate : this.cert.chainAsCertSet()) {
-            trustStore.setEntry(certificate.getSubjectX500Principal().getName() + "-" + aliasIndex, new KeyStore.TrustedCertificateEntry(certificate), null);
+            trustStore.setEntry(certificate.getSubjectX500Principal().getName() + "-" + aliasIndex,
+                    new KeyStore.TrustedCertificateEntry(certificate), null);
             aliasIndex++;
         }
         return trustStore;

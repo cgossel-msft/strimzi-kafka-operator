@@ -5,7 +5,7 @@
 package io.strimzi.operator.common.auth;
 
 import io.fabric8.kubernetes.api.model.Secret;
-import io.strimzi.operator.common.model.CosmicPemPrivateCert;
+import io.strimzi.operator.common.model.MicrosoftPemPrivateCert;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,7 +30,7 @@ public class PemAuthIdentity {
      * Filename suffix for certificate chain as PEM
      */
     public static final String PEM_SUFFIX = "pem";
-    private final CosmicPemPrivateCert cert;
+    private final MicrosoftPemPrivateCert cert;
 
     /**
      * Constructs the PemAuthIdentity.
@@ -42,7 +42,7 @@ public class PemAuthIdentity {
      */
     private PemAuthIdentity(Secret secret, String secretCertName) {
         Objects.requireNonNull(secret, "Cannot extract auth identity from null secret.");
-        this.cert = CosmicPemPrivateCert.loadInternal();
+        this.cert = MicrosoftPemPrivateCert.loadInternal();
     }
 
     /**
@@ -141,7 +141,7 @@ public class PemAuthIdentity {
 
         KeyStore coKeyStore = KeyStore.getInstance("JKS");
         coKeyStore.load(null);
-        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[]{certificateChain()});
+        coKeyStore.setKeyEntry("cluster-operator", key, password, new Certificate[] { certificateChain() });
         return coKeyStore;
     }
 

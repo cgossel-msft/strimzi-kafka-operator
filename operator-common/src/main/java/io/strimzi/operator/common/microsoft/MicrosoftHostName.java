@@ -2,7 +2,7 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.operator.common.cosmic;
+package io.strimzi.operator.common.microsoft;
 
 import io.strimzi.operator.common.ReconciliationLogger;
 
@@ -10,18 +10,20 @@ import java.util.Arrays;
 import java.util.Locale;
 
 /**
- * Defines what kafka related host names look like in cosmic.
+ * Defines what kafka related host names look like in microsoft.
  */
-public class CosmicHostName {
+public class MicrosoftHostName {
     private static final ReconciliationLogger LOGGER = ReconciliationLogger
-            .create(CosmicHostName.class);
+            .create(MicrosoftHostName.class);
     private static final String SERVICE_MARKER = "{SERVICE}";
     private static final String NAMESPACE_MARKER = "{NAMESPACE}";
-    private static final String INTERNAL_DOMAIN_FORMAT_ENV = "COSMIC_KAFKA_DOMAIN_FORMAT";
+    private static final String INTERNAL_DOMAIN_FORMAT_ENV = "MSFT_KAFKA_DOMAIN_FORMAT";
     private static final String INTERNAL_DOMAIN_FORMAT = getInternalDomainFormat();
 
     /**
-     * Substitute the host in the given address for the appropriate cosmic kafka host.
+     * Substitute the host in the given address for the appropriate microsoft kafka
+     * host.
+     * 
      * @param strimziAddress the host to be substituted
      * @return the address with the subsitution
      */
@@ -53,12 +55,12 @@ public class CosmicHostName {
             }
 
             LOGGER.infoOp(String.format(
-                    "cosmic host substitution: in=%s, out=%s",
+                    "microsoft host substitution: in=%s, out=%s",
                     strimziAddress,
                     substitution));
             return substitution;
         } catch (Exception e) {
-            LOGGER.errorOp("cosmic host substitution failed: in=" + strimziAddress, e);
+            LOGGER.errorOp("microsoft host substitution failed: in=" + strimziAddress, e);
             throw new RuntimeException(e);
         }
     }

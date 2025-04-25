@@ -17,7 +17,7 @@ import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.TimeoutException;
 import io.strimzi.operator.common.Util;
 import io.strimzi.operator.common.auth.PemTrustSet;
-import io.strimzi.operator.common.cosmic.CosmicHostName;
+import io.strimzi.operator.common.microsoft.MicrosoftHostName;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlApiProperties;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlEndpoints;
 import io.strimzi.operator.common.model.cruisecontrol.CruiseControlHeaders;
@@ -76,7 +76,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlResponse> getCruiseControlState(Reconciliation reconciliation, String host, int port, boolean verbose) {
-        var subHost = CosmicHostName.substitute(host);
+        var subHost = MicrosoftHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STATE)
                 .withParameter(CruiseControlParameters.VERBOSE, String.valueOf(verbose))
                 .withParameter(CruiseControlParameters.JSON, "true")
@@ -172,7 +172,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     }
 
     private CompletableFuture<CruiseControlRebalanceResponse> internalRebalance(Reconciliation reconciliation, String host, int port, String path, String userTaskId) {
-        var subHost = CosmicHostName.substitute(host);
+        var subHost = MicrosoftHostName.substitute(host);
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(String.format("%s://%s:%d%s", apiSslEnabled ? "https" : "http", subHost, port, path)))
                 .POST(HttpRequest.BodyPublishers.noBody());
@@ -321,7 +321,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
 
     @Override
     public CompletableFuture<CruiseControlUserTasksResponse> getUserTaskStatus(Reconciliation reconciliation, String host, int port, String userTaskId) {
-        var subHost = CosmicHostName.substitute(host);
+        var subHost = MicrosoftHostName.substitute(host);
         PathBuilder pathBuilder = new PathBuilder(CruiseControlEndpoints.USER_TASKS)
                         .withParameter(CruiseControlParameters.JSON, "true")
                         .withParameter(CruiseControlParameters.FETCH_COMPLETE, "true");
@@ -443,7 +443,7 @@ public class CruiseControlApiImpl implements CruiseControlApi {
     @Override
     @SuppressWarnings("deprecation")
     public CompletableFuture<CruiseControlResponse> stopExecution(Reconciliation reconciliation, String host, int port) {
-        var subHost = CosmicHostName.substitute(host);
+        var subHost = MicrosoftHostName.substitute(host);
         String path = new PathBuilder(CruiseControlEndpoints.STOP)
                         .withParameter(CruiseControlParameters.JSON, "true").build();
 

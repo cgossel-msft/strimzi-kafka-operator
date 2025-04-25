@@ -8,7 +8,7 @@ set +x
 # $3: Keystore password
 function create_keystore()
 {
-    echo "Creating Cosmic keystore $2 from $1"
+    echo "Creating Microsoft keystore $2 from $1"
     rm -f "$2"
     ALIAS=$(basename "$1" .pem)
     RANDFILE=/tmp/.rnd openssl pkcs12 -export -in "$1" -out "$2" -name "$ALIAS" -password pass:"$3" -certpbe aes-128-cbc -keypbe aes-128-cbc -macalg sha256
@@ -20,7 +20,7 @@ function create_keystore()
 # $3: Truststore password
 function create_truststore()
 {
-    echo "Creating Cosmic truststore $2 from $1"
+    echo "Creating Microsoft truststore $2 from $1"
 
     # Disable FIPS if needed
     if [ "$FIPS_MODE" = "disabled" ]; then
@@ -29,7 +29,7 @@ function create_truststore()
         KEYTOOL_OPTS=""
     fi
 
-    SCRATCH="/tmp/cosmic-scratch"
+    SCRATCH="/tmp/msft-scratch"
     mkdir -p $SCRATCH
     BASE=$(basename "$1" .pem)
     i=1
@@ -48,12 +48,12 @@ function create_truststore()
     done < $1
 }
 
-echo "Cosmic Kafka Cert Preparation"
+echo "Microsoft Kafka Cert Preparation"
 
 KEYSTORE=/tmp/topic-operator/replication.keystore.p12
 TRUSTSTORE=/tmp/topic-operator/replication.truststore.p12
 
-create_keystore "$COSMIC_KAFKA_INTERNAL_CERT" "$KEYSTORE" "$CERTS_STORE_PASSWORD"
+create_keystore "$MSFT_KAFKA_INTERNAL_CERT" "$KEYSTORE" "$CERTS_STORE_PASSWORD"
 
 rm -f "$TRUSTSTORE"
-create_truststore "$COSMIC_KAFKA_INTERNAL_CERT" "$TRUSTSTORE" "$CERTS_STORE_PASSWORD"
+create_truststore "$MSFT_KAFKA_INTERNAL_CERT" "$TRUSTSTORE" "$CERTS_STORE_PASSWORD"

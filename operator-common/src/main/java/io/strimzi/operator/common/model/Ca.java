@@ -300,7 +300,7 @@ public abstract class Ca {
     protected RenewalType renewalType;
     protected boolean caCertsRemoved;
     protected final CertificateExpirationPolicy policy;
-    private final CosmicPemPrivateCert caPem;
+    private final MicrosoftPemPrivateCert caPem;
 
     /**
      * Constructs the CA object
@@ -340,7 +340,7 @@ public abstract class Ca {
         this.policy = policy == null ? CertificateExpirationPolicy.RENEW_CERTIFICATE : policy;
         this.renewalType = RenewalType.NOOP;
         this.clock = Clock.systemUTC();
-        this.caPem = CosmicPemPrivateCert.loadInternal();
+        this.caPem = MicrosoftPemPrivateCert.loadInternal();
     }
 
     protected abstract String caName();
@@ -887,7 +887,7 @@ public abstract class Ca {
      * @return  An X509Certificate instance with the certificate
      */
     public static X509Certificate cert(Secret secret, String key)  {
-        return CosmicPemPrivateCert.loadInternal().chainAsCert();
+        return MicrosoftPemPrivateCert.loadInternal().chainAsCert();
     }
 
     /**
@@ -898,7 +898,7 @@ public abstract class Ca {
      * @return          Set with X509Certificate instances
      */
     public static Set<X509Certificate> certs(Secret secret)  {
-        return Set.of(CosmicPemPrivateCert.loadInternal().chainAsCert());
+        return Set.of(MicrosoftPemPrivateCert.loadInternal().chainAsCert());
     }
 
     /**

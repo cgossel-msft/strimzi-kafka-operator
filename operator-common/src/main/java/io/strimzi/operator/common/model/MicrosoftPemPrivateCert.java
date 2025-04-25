@@ -16,10 +16,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Cosmic private key and cert with full chain in PEM format.
+ * Microsoft private key and cert with full chain in PEM format.
  */
-public class CosmicPemPrivateCert {
-    private static final String COSMIC_CERT_ENV = "COSMIC_KAFKA_INTERNAL_CERT";
+public class MicrosoftPemPrivateCert {
+    private static final String INTERNAL_CERT_ENV = "MSFT_KAFKA_INTERNAL_CERT";
     private static final String PEM_PRIVATE_KEY_BEGIN = "-----BEGIN PRIVATE KEY-----";
     private static final String PEM_PRIVATE_KEY_END = "-----END PRIVATE KEY-----";
     private static final String PEM_CERT_END = "-----END CERTIFICATE-----";
@@ -34,10 +34,11 @@ public class CosmicPemPrivateCert {
 
     /**
      * Constructor
-     * @param key the key as PEM string
+     * 
+     * @param key   the key as PEM string
      * @param chain the public chain as a PEM string
      */
-    public CosmicPemPrivateCert(String key, String chain) {
+    public MicrosoftPemPrivateCert(String key, String chain) {
         this.key = key;
         this.chain = chain;
         this.keyBytes = this.key.getBytes(StandardCharsets.US_ASCII);
@@ -70,6 +71,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The private key
+     * 
      * @return private key as PEM string.
      */
     public String key() {
@@ -78,6 +80,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The private key
+     * 
      * @return the private key as PEM bytes
      */
     public byte[] keyAsBytes() {
@@ -86,6 +89,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The private key.
+     * 
      * @return private key stripped of PEM headers
      */
     public String strippedKey() {
@@ -97,6 +101,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The public cert chain
+     * 
      * @return the public cert chain as a PEM string
      */
     public String chain() {
@@ -105,6 +110,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The public cert chain
+     * 
      * @return the public cert chain as PEM bytes
      */
     public byte[] chainAsBytes() {
@@ -113,6 +119,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The public cert chain
+     * 
      * @return the public cert chain as a single x509
      */
     public X509Certificate chainAsCert() {
@@ -121,7 +128,9 @@ public class CosmicPemPrivateCert {
 
     /**
      * The public cert chain
-     * @return the public cert chain split into a set of PEM byte arrays, one for each cert in the chain
+     * 
+     * @return the public cert chain split into a set of PEM byte arrays, one for
+     *         each cert in the chain
      */
     public Set<byte[]> chainAsSet() {
         return new HashSet<>(this.chainSet);
@@ -129,6 +138,7 @@ public class CosmicPemPrivateCert {
 
     /**
      * The public cert chain
+     * 
      * @return the public cert chain split into a set of x509 certs
      */
     public Set<X509Certificate> chainAsCertSet() {
@@ -136,21 +146,22 @@ public class CosmicPemPrivateCert {
     }
 
     /**
-     * Get the cosmic internal kafka private cert
-     * @return the PEM key and chain for the cosmic internal kafka private cert
+     * Get the microsoft internal kafka private cert
+     * 
+     * @return the PEM key and chain for the microsoft internal kafka private cert
      */
-    public static CosmicPemPrivateCert loadInternal() {
+    public static MicrosoftPemPrivateCert loadInternal() {
         try {
-            String certPath = System.getenv(COSMIC_CERT_ENV);
+            String certPath = System.getenv(INTERNAL_CERT_ENV);
             String certString = Files.readString(Path.of(certPath));
             int privateStart = certString.indexOf(PEM_PRIVATE_KEY_BEGIN);
             int privateEnd = certString.indexOf(PEM_PRIVATE_KEY_END) + PEM_PRIVATE_KEY_END.length();
             String privateKeyString = certString.substring(privateStart, privateEnd);
             String certChainString = certString.substring(0, privateStart)
                     + certString.substring(privateEnd);
-            return new CosmicPemPrivateCert(privateKeyString, certChainString);
+            return new MicrosoftPemPrivateCert(privateKeyString, certChainString);
         } catch (Throwable e) {
-            throw new RuntimeException("Could not read cosmic internal cert", e);
+            throw new RuntimeException("Could not read microsoft internal cert", e);
         }
     }
 }

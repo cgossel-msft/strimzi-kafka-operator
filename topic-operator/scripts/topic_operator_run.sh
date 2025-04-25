@@ -46,7 +46,7 @@ fi
 export JAVA_CLASSPATH=$JAVA_CLASSPATH:lib/io.strimzi.@project.build.finalName@.@project.packaging@:@project.dist.classpath@
 export JAVA_MAIN=io.strimzi.operator.topic.TopicOperatorMain
 
-export STRIMZI_KAFKA_BOOTSTRAP_SERVERS=$COSMIC_KAFKA_REPLICATION_BOOTSTRAP
-echo "Overrode kafka bootstrap for cosmic: $STRIMZI_KAFKA_BOOTSTRAP_SERVERS"
+export STRIMZI_KAFKA_BOOTSTRAP_SERVERS=$MSFT_KAFKA_REPLICATION_BOOTSTRAP
+echo "Overrode kafka bootstrap for microsoft: $STRIMZI_KAFKA_BOOTSTRAP_SERVERS"
 
 exec "${STRIMZI_HOME}/bin/launch_java.sh"

@@ -57,7 +57,7 @@ public class SecretOperator extends
         AbstractNamespacedResourceOperator<KubernetesClient, Secret, SecretList, Resource<Secret>> {
     private static final ReconciliationLogger LOGGER = ReconciliationLogger
             .create(SecretOperator.class);
-    private static final String KAFKA_CLUSTER_NAME_ENV = "COSMIC_KAFKA_CLUSTER_NAME";
+    private static final String KAFKA_CLUSTER_NAME_ENV = "MSFT_KAFKA_CLUSTER_NAME";
     private static final String[] CERT_SECRETS_SUFFIXES = new String[] {
         "clients-ca", "clients-ca-cert", "cluster-ca",
         "cluster-ca-cert", "cluster-operator-certs", "entity-topic-operator-certs",

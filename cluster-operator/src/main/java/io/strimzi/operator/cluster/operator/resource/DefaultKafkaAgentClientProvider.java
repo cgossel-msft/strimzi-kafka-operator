@@ -6,7 +6,7 @@ package io.strimzi.operator.cluster.operator.resource;
 
 import io.strimzi.operator.common.Reconciliation;
 import io.strimzi.operator.common.auth.TlsPemIdentity;
-import io.strimzi.operator.common.cosmic.CosmicHostName;
+import io.strimzi.operator.common.microsoft.MicrosoftHostName;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,7 +30,7 @@ public class DefaultKafkaAgentClientProvider implements KafkaAgentClientProvider
 
         @Override
         String doGet(URI uri) {
-            var host = CosmicHostName.substitute(uri.getHost());
+            var host = MicrosoftHostName.substitute(uri.getHost());
             URI redirect;
             try {
                 redirect = new URI(uri.getScheme(), uri.getUserInfo(), host, uri.getPort(),

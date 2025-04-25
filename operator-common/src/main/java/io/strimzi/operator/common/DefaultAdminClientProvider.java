@@ -6,7 +6,7 @@ package io.strimzi.operator.common;
 
 import io.strimzi.operator.common.auth.PemAuthIdentity;
 import io.strimzi.operator.common.auth.PemTrustSet;
-import io.strimzi.operator.common.cosmic.CosmicHostName;
+import io.strimzi.operator.common.microsoft.MicrosoftHostName;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -70,12 +70,12 @@ public class DefaultAdminClientProvider implements AdminClientProvider {
 
         var hosts = bootstrapHostnames.split(",");
         for (int i = 0; i < hosts.length; i++) {
-            hosts[i] = CosmicHostName.substitute(hosts[i]);
+            hosts[i] = MicrosoftHostName.substitute(hosts[i]);
         }
 
         bootstrapHostnames = String.join(",", hosts);
 
-        LOGGER.infoOp("creating cosmic admin client: bootstrap=" + bootstrapHostnames);
+        LOGGER.infoOp("creating microsoft admin client: bootstrap=" + bootstrapHostnames);
 
         config.setProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapHostnames);
 
