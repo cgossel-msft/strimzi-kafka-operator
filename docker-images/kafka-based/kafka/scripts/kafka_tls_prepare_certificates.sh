@@ -56,7 +56,7 @@ TRUSTSTORE=/tmp/kafka/cluster.truststore.p12
 rm -f "$TRUSTSTORE"
 create_truststore "$MSFT_KAFKA_INTERNAL_CERT" "$TRUSTSTORE" "$CERTS_STORE_PASSWORD"
 
-if [ -n "$MSFT_KAFKA_EXTERNAL_CERT"]; then
+if [ -n "$MSFT_KAFKA_EXTERNAL_CERT" ]; then
     KEYSTORE=/tmp/kafka/external.keystore.p12
     create_truststore "$MSFT_KAFKA_EXTERNAL_CERT" "$KEYSTORE" "$CERTS_STORE_PASSWORD"
 fi
