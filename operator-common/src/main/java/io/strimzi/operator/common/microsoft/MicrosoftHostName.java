@@ -8,6 +8,7 @@ import io.strimzi.operator.common.ReconciliationLogger;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Defines what kafka related host names look like in microsoft.
@@ -19,6 +20,7 @@ public class MicrosoftHostName {
     private static final String NAMESPACE_MARKER = "{NAMESPACE}";
     private static final String INTERNAL_DOMAIN_FORMAT_ENV = "MSFT_KAFKA_DOMAIN_FORMAT";
     private static final String INTERNAL_DOMAIN_FORMAT = getInternalDomainFormat();
+    private static final Pattern INTERNAL_DOMAIN_PATTERN = getInternalDomainRegex();
 
     /**
      * Substitute the host in the given address for the appropriate microsoft kafka
@@ -29,9 +31,23 @@ public class MicrosoftHostName {
      */
     public static String substitute(String strimziAddress) {
         try {
-            // given {<prefix>.}*<service>.<namespace>.svc{.cluster.local}{:<port>}
+            var matcher = INTERNAL_DOMAIN_PATTERN.matcher(strimziAddress);
+            if (matcher.find()) {
+                LOGGER.infoOp(String.format(
+                        "microsoft host substitution unnecessary: in=%s",
+                        strimziAddress));
+                return strimziAddress;
+            }
+
+            // given {<prefix>.}*<service>.<namespace>{.svc{.cluster.local}}{:<port>}
             // split everything before ".svc" by periods
             var index = strimziAddress.toLowerCase(Locale.US).indexOf(".svc");
+            var portIndex = strimziAddress.lastIndexOf(":");
+            if (index < 0) {
+                // if we did not find .svc, assume it is left out
+                index = portIndex < 0 ? strimziAddress.length() : portIndex;
+            }
+
             var parts = strimziAddress.substring(0, index).split("\\.");
 
             // namespace is the last part, service the previous
@@ -49,8 +65,7 @@ public class MicrosoftHostName {
             var substitution = String.join(".", Arrays.copyOf(parts, index + 1));
 
             // check if we need to add the port
-            index = strimziAddress.lastIndexOf(":");
-            if (index >= 0) {
+            if (portIndex >= 0) {
                 substitution += strimziAddress.substring(index);
             }
 
@@ -72,5 +87,18 @@ public class MicrosoftHostName {
         }
 
         return domainFormat;
+    }
+
+    private static Pattern getInternalDomainRegex() {
+        var regex = INTERNAL_DOMAIN_FORMAT
+                .replace(".", "\\.")
+                .replace(SERVICE_MARKER, ".*")
+                .replace(NAMESPACE_MARKER, ".*");
+        if (!regex.startsWith(".*")) {
+                regex = ".*" + regex;
+        }
+
+        regex += "(:[0-9]+)?$";
+        return Pattern.compile(regex);
     }
 }
