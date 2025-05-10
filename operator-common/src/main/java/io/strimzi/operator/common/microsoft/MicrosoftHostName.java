@@ -95,7 +95,7 @@ public class MicrosoftHostName {
                 .replace(SERVICE_MARKER, ".*")
                 .replace(NAMESPACE_MARKER, ".*");
         if (!regex.startsWith(".*")) {
-                regex = ".*" + regex;
+            regex = ".*" + regex;
         }
 
         regex += "(:[0-9]+)?$";
