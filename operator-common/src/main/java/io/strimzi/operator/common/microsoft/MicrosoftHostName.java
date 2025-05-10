@@ -66,7 +66,7 @@ public class MicrosoftHostName {
 
             // check if we need to add the port
             if (portIndex >= 0) {
-                substitution += strimziAddress.substring(index);
+                substitution += strimziAddress.substring(portIndex);
             }
 
             LOGGER.infoOp(String.format(
