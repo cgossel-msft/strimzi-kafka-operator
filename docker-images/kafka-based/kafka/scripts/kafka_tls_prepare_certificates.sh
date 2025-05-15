@@ -58,5 +58,5 @@ create_truststore "$MSFT_KAFKA_INTERNAL_CERT" "$TRUSTSTORE" "$CERTS_STORE_PASSWO
 
 if [ -n "$MSFT_KAFKA_EXTERNAL_CERT" ]; then
     KEYSTORE=/tmp/kafka/external.keystore.p12
-    create_truststore "$MSFT_KAFKA_EXTERNAL_CERT" "$KEYSTORE" "$CERTS_STORE_PASSWORD"
+    create_keystore "$MSFT_KAFKA_EXTERNAL_CERT" "$KEYSTORE" "$CERTS_STORE_PASSWORD"
 fi
