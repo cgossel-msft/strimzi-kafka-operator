@@ -9,6 +9,9 @@ import io.fabric8.kubernetes.api.model.rbac.RoleList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.strimzi.operator.common.Reconciliation;
+import io.strimzi.operator.common.operator.resource.ReconcileResult;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 /**
@@ -31,5 +34,10 @@ public class RoleOperator extends AbstractNamespacedResourceOperator<
     @Override
     protected MixedOperation<Role, RoleList, Resource<Role>> operation() {
         return client.rbac().roles();
+    }
+
+    @Override
+    public Future<ReconcileResult<Role>> reconcile(Reconciliation reconciliation, String namespace, String name, Role desired) {
+        return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }

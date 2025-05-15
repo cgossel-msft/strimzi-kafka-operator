@@ -11,6 +11,9 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.strimzi.operator.common.Reconciliation;
+import io.strimzi.operator.common.operator.resource.ReconcileResult;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 import java.io.IOException;
@@ -49,5 +52,10 @@ public class ClusterRoleOperator extends AbstractNonNamespacedResourceOperator<K
         } catch (IOException e)   {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Future<ReconcileResult<ClusterRole>> reconcile(Reconciliation reconciliation, String name, ClusterRole desired) {
+        return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }

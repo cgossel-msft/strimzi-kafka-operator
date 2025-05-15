@@ -9,6 +9,9 @@ import io.fabric8.kubernetes.api.model.rbac.ClusterRoleBindingList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import io.strimzi.operator.common.Reconciliation;
+import io.strimzi.operator.common.operator.resource.ReconcileResult;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 
 /**
@@ -29,5 +32,10 @@ public class ClusterRoleBindingOperator extends AbstractNonNamespacedResourceOpe
     @Override
     protected NonNamespaceOperation<ClusterRoleBinding, ClusterRoleBindingList, Resource<ClusterRoleBinding>> operation() {
         return client.rbac().clusterRoleBindings();
+    }
+
+    @Override
+    public Future<ReconcileResult<ClusterRoleBinding>> reconcile(Reconciliation reconciliation, String name, ClusterRoleBinding desired) {
+        return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }
