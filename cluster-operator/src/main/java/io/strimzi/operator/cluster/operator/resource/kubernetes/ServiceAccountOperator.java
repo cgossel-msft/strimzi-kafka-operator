@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.ServiceAccountResource;
 import io.strimzi.operator.common.Reconciliation;
+import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.operator.resource.ReconcileResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -20,6 +21,8 @@ import java.util.Map;
  * Operator for managing Service Accounts
  */
 public class ServiceAccountOperator extends AbstractNamespacedResourceOperator<KubernetesClient, ServiceAccount, ServiceAccountList, ServiceAccountResource> {
+    private static final ReconciliationLogger LOGGER = ReconciliationLogger
+            .create(ServiceAccountOperator.class);
     /* test */ static final String OPENSHIFT_IO_INTERNAL_REGISTRY_PULL_SECRET_REF = "openshift.io/internal-registry-pull-secret-ref";
 
     /**
@@ -33,7 +36,7 @@ public class ServiceAccountOperator extends AbstractNamespacedResourceOperator<K
 
     @Override
     public Future<ReconcileResult<ServiceAccount>> reconcile(Reconciliation reconciliation, String namespace, String name, ServiceAccount desired) {
-        System.out.println("serviceaccount noop: " + name);
+        LOGGER.infoOp("serviceaccount reconcile noop: {}", name);
         return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 

@@ -10,6 +10,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.strimzi.operator.common.Reconciliation;
+import io.strimzi.operator.common.ReconciliationLogger;
 import io.strimzi.operator.common.operator.resource.ReconcileResult;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -20,6 +21,8 @@ import io.vertx.core.Vertx;
 public class RoleBindingOperator extends AbstractNamespacedResourceOperator<KubernetesClient, RoleBinding,
         RoleBindingList,
         Resource<RoleBinding>> {
+    private static final ReconciliationLogger LOGGER = ReconciliationLogger
+            .create(RoleBindingOperator.class);
     /**
      * Constructor
      * @param vertx The Vertx instance
@@ -36,7 +39,7 @@ public class RoleBindingOperator extends AbstractNamespacedResourceOperator<Kube
     
     @Override
     public Future<ReconcileResult<RoleBinding>> reconcile(Reconciliation reconciliation, String namespace, String name, RoleBinding desired) {
-        System.out.println("rolebinding noop: " + name);
+        LOGGER.infoOp("rolebinding reconcile noop: {}", name);
         return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }
