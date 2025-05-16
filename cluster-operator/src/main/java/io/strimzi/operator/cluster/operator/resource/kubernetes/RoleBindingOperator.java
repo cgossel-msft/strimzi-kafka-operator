@@ -36,6 +36,7 @@ public class RoleBindingOperator extends AbstractNamespacedResourceOperator<Kube
     
     @Override
     public Future<ReconcileResult<RoleBinding>> reconcile(Reconciliation reconciliation, String namespace, String name, RoleBinding desired) {
+        System.out.println("rolebinding noop: " + name);
         return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }

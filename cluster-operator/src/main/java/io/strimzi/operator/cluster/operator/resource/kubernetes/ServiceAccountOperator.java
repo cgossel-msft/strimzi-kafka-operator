@@ -32,6 +32,12 @@ public class ServiceAccountOperator extends AbstractNamespacedResourceOperator<K
     }
 
     @Override
+    public Future<ReconcileResult<ServiceAccount>> reconcile(Reconciliation reconciliation, String namespace, String name, ServiceAccount desired) {
+        System.out.println("serviceaccount noop: " + name);
+        return Future.succeededFuture(ReconcileResult.noop(desired));
+    }
+
+    @Override
     protected MixedOperation<ServiceAccount, ServiceAccountList, ServiceAccountResource> operation() {
         return client.serviceAccounts();
     }

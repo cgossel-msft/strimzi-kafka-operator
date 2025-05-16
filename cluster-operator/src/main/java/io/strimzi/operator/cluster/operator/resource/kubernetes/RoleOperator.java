@@ -38,6 +38,7 @@ public class RoleOperator extends AbstractNamespacedResourceOperator<
 
     @Override
     public Future<ReconcileResult<Role>> reconcile(Reconciliation reconciliation, String namespace, String name, Role desired) {
+        System.out.println("role noop: " + name);
         return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }

@@ -36,6 +36,7 @@ public class ClusterRoleBindingOperator extends AbstractNonNamespacedResourceOpe
 
     @Override
     public Future<ReconcileResult<ClusterRoleBinding>> reconcile(Reconciliation reconciliation, String name, ClusterRoleBinding desired) {
+        System.out.println("clusterrolebinding noop: " + name);
         return Future.succeededFuture(ReconcileResult.noop(desired));
     }
 }
